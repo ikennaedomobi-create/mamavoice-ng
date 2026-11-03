@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MamaVoice NG - AI Voice Assistant for Maternal Health</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif}
+body{background:#FFF7ED;color:#1F2937;padding-bottom:80px}
+.header{background:linear-gradient(135deg,#DB2777,#F97316);color:white;padding:22px 18px 28px;border-radius:0 0 28px 28px}
+.header small{background:#FDE68A;color:#92400E;padding:4px 10px;border-radius:20px;font-weight:700;font-size:12px}
+.header h1{font-size:32px;margin:12px 0 4px;line-height:1.1}
+.header p{opacity:.95;font-size:15px;line-height:1.5}
+.card{background:white;margin:14px;border-radius:20px;padding:18px;box-shadow:0 4px 18px rgba(0,0,0,.07)}
+.voice-box{text-align:center}
+.mic{width:92px;height:92px;border-radius:50%;background:#DB2777;color:white;font-size:38px;border:none;margin:12px auto;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 25px rgba(219,39,119,.4);cursor:pointer}
+.mic.listening{background:#DC2626;animation:pulse 1s infinite}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+.btn{width:100%;padding:14px;border:none;border-radius:14px;font-weight:700;font-size:16px;cursor:pointer;margin-top:8px}
+.btn-pink{background:#DB2777;color:white}
+.btn-green{background:#059669;color:white}
+.btn-outline{background:#FFF1F2;color:#BE185D;border:1px solid #FBCFE8}
+.chip{display:inline-block;background:#FFF1F2;color:#BE185D;padding:7px 12px;border-radius:20px;font-size:13px;font-weight:600;margin:4px 4px 0 0;cursor:pointer;border:1px solid #FBCFE8}
+.danger{background:#FEF2F2;border:1px solid #FECACA}
+.danger h3{color:#DC2626}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.mini{background:#FFFBEB;border-radius:16px;padding:14px;text-align:center}
+.mini b{font-size:22px;display:block}
+input,select{width:100%;padding:12px;border:1px solid #E5E7EB;border-radius:12px;margin-top:8px;font-size:15px}
+#output{background:#FFFBEB;border-radius:14px;padding:14px;margin-top:12px;line-height:1.6;min-height:60px;white-space:pre-wrap}
+.badge{display:inline-block;background:#DCFCE7;color:#166534;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.footer{text-align:center;font-size:12px;color:#9CA3AF;padding:16px}
+</style>
+</head>
+<body>
+
+<div class="header">
+<small>● UNICEF • WHO-BASED • NIGERIA</small>
+<h1>MamaVoice NG</h1>
+<p>Your AI voice assistant for safe pregnancy. Talk in <b>Pidgin, Yoruba, Hausa, Igbo or English</b>. I go listen, I go help.</p>
+<div style="margin-top:14px;display:flex;gap:8px">
+<span style="background:rgba(255,255,255,.22);padding:6px 12px;border-radius:20px;font-size:13px">🎙️ Voice First</span>
+<span style="background:rgba(255,255,255,.22);padding:6px 12px;border-radius:20px;font-size:13px">📱 Works Offline</span>
+<span style="background:rgba(255,255,255,.22);padding:6px 12px;border-radius:20px;font-size:13px">🇳🇬 Low-Literacy</span>
+</div>
+</div>
+
+<div class="card voice-box">
+<span class="badge">● LIVE DEMO - TAP TO TALK</span>
+<h2 style="margin:10px 0 4px">Talk to MamaVoice</h2>
+<p style="color:#6B7280;font-size:14px">Press the mic, talk in Pidgin. Example: <i>"I get headache and my leg dey swell"</i></p>
+<button class="mic" id="micBtn" onclick="startVoice()">🎙️</button>
+<p id="listenText" style="font-weight:700;color:#DB2777">Tap mic to start</p>
+<div id="output">MamaVoice: Hello mama, how you dey today? Tell me how your body dey feel...</div>
+<div style="text-align:left;margin-top:12px">
+<b>Quick talk:</b><br>
+<span class="chip" onclick="ask('I get severe headache')">🤕 Severe headache</span>
+<span class="chip" onclick="ask('My leg dey swell')">🦵 Leg dey swell</span>
+<span class="chip" onclick="ask('I dey see blood')">🩸 I dey see blood</span>
+<span class="chip" onclick="ask('Baby no dey move')">👶 Baby no dey move</span>
+<span class="chip" onclick="ask('When be my next antenatal?')">📅 Antenatal date</span>
+</div>
+<button class="btn btn-pink" onclick="startVoice()">🎙️ Start Voice Chat</button>
+</div>
+
+<div class="card danger">
+<h3>🚨 Danger Signs - Go Hospital NOW</h3>
+<p style="font-size:14px;margin:8px 0;color:#7F1D1D">If you see any of these, no wait. Go hospital or call emergency.</p>
+<div id="dangerList" style="font-size:14px;line-height:1.8">
+• Severe headache + eye dey blur<br>
+• Heavy bleeding (pad full in 1 hour)<br>
+• Convulsion / fit<br>
+• Baby no move for 12 hours<br>
+• High fever + shivering<br>
+• Water break before 37 weeks + fever
+</div>
+<button class="btn" style="background:#DC2626;color:white" onclick="alert('EMERGENCY: Call 112 or go to nearest General Hospital NOW. Tell them: Pregnant woman with danger sign.')">📞 EMERGENCY - CALL 112</button>
+</div>
+
+<div class="card">
+<h2>📅 My Antenatal Tracker</h2>
+<p style="color:#6B7280;font-size:14px">Enter your last period date, we go calculate your due date.</p>
+<label style="font-size:13px;font-weight:700">Last Period Date</label>
+<input type="date" id="lmp">
+<button class="btn btn-green" onclick="calcDue()">Calculate My Due Date</button>
+<div id="dueResult" style="margin-top:10px;font-weight:700"></div>
+<div class="grid">
+<div class="mini">🤰<b id="weeks">--</b><span style="font-size:13px">Weeks Pregnant</span></div>
+<div class="mini">📅<b id="visits">8</b><span style="font-size:13px">WHO Visits Needed</span></div>
+<div class="mini">💊<b>Daily</b><span style="font-size:13px">Folic Acid + Iron</span></div>
+<div class="mini">🏥<b>Next</b><span style="font-size:13px">Antenatal Visit</span></div>
+</div>
+</div>
+
+<div class="card">
+<h2>💬 WhatsApp & USSD</h2>
+<p style="font-size:14px;color:#6B7280;line-height:1.6">No smartphone? No wahala.<br><br><b>WhatsApp:</b> Send "HI" to MamaVoice on WhatsApp<br><b>USSD:</b> Dial <b>*384*MAMA#</b> on any phone<br><b>Voice Call:</b> Call MamaVoice line for free</p>
+<button class="btn btn-outline" onclick="alert('WhatsApp Demo: In full version, this opens WhatsApp chat with MamaVoice.')">💬 Open WhatsApp Demo</button>
+</div>
+
+<div class="card">
+<h2>🌍 Language</h2>
+<div>
+<span class="chip" onclick="setLang('Pidgin')">Nigerian Pidgin ⭐</span>
+<span class="chip" onclick="setLang('Yoruba')">Yoruba</span>
+<span class="chip" onclick="setLang('Hausa')">Hausa</span>
+<span class="chip" onclick="setLang('Igbo')">Igbo</span>
+<span class="chip" onclick="setLang('English')">English</span>
+</div>
+<p id="langText" style="margin-top:10px;font-size:14px">Current: <b>Pidgin</b> - "How you dey, mama?"</p>
+</div>
+
+<p class="footer">MamaVoice NG • Built for low-literacy pregnant women in Nigeria<br>Based on WHO Antenatal Care Guidelines • For UNICEF Innovation<br><b>Disclaimer:</b> This is health education, not a doctor. For danger signs, go to hospital immediately.</p>
+
+<script>
+let lang='Pidgin';
+function setLang(l){lang=l;document.getElementById('langText').innerHTML='Current: <b>'+l+'</b> - MamaVoice go talk to you for '+l; speak('Hello mama, I go talk to you for '+l);}
+function speak(text){
+  try{
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-NG'; u.rate=0.95; speechSynthesis.speak(u);
+  }catch(e){}
+}
+function ask(q){
+  const out=document.getElementById('output');
+  let ans='';
+  const low=q.toLowerCase();
+  if(low.includes('headache')||low.includes('swell')||low.includes('blur')){
+    ans="Mama, this fit be PRE-ECLAMPSIA - e serious o!\n\n1. Go hospital TODAY, no wait till tomorrow\n2. Check your blood pressure if you fit\n3. No take medicine by yourself\n4. Rest for left side, no stress\n\nIf headache strong + eye dey blur + leg swell, na EMERGENCY. Go General Hospital now.";
+  } else if(low.includes('blood')||low.includes('bleed')){
+    ans="Mama, bleeding for pregnancy na EMERGENCY!\n\n1. Go hospital NOW - call 112 or enter keke\n2. Use pad, count how many pad you full\n3. No put anything inside\n4. No wait, no take herbs\n\nTell hospital: 'I dey pregnant and I dey bleed.'";
+  } else if(low.includes('baby')&&low.includes('move')){
+    ans="Baby no dey move? Do this now:\n\n1. Chop small food, drink cold water\n2. Lie for left side for 1 hour, count kicks\n3. If less than 10 kicks in 2 hours OR no movement at all, go hospital TODAY.\n\nBaby suppose move everyday.";
+  } else if(low.includes('antenatal')||low.includes('next')){
+    ans="Your antenatal visits (WHO say 8 visits):\n\n1st: Before 12 weeks\n2nd: 20 weeks\n3rd: 26 weeks\n4th: 30 weeks\n5th: 34 weeks\n6th: 36 weeks\n7th: 38 weeks\n8th: 40 weeks\n\nGo with your ANC card. Ask nurse for tetanus, malaria drugs, and blood test.";
+  } else {
+    ans="I hear you mama. Tell me more: You get fever? Headache? Bleeding? Baby dey move?\n\nIf you feel any danger sign, go hospital now. I dey here to help you.";
+  }
+  out.textContent="You: "+q+"\n\nMamaVoice ("+lang+"): "+ans;
+  speak(ans.replace(/\n/g,' '));
+}
+function startVoice(){
+  const btn=document.getElementById('micBtn');
+  const txt=document.getElementById('listenText');
+  if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)){
+    alert('Voice no work for this browser. Use the Quick Talk buttons below - e go work.');
+    return;
+  }
+  const Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const rec=new Rec(); rec.lang='en-NG'; rec.interimResults=false;
+  btn.classList.add('listening'); txt.textContent='I dey listen... talk now...';
+  rec.onresult=(e)=>{ const t=e.results[0][0].transcript; txt.textContent='You talk: '+t; ask(t); btn.classList.remove('listening'); };
+  rec.onerror=()=>{txt.textContent='Try again - tap mic'; btn.classList.remove('listening');};
+  rec.onend=()=>{btn.classList.remove('listening'); if(txt.textContent.includes('listen')) txt.textContent='Tap mic to start';};
+  rec.start();
+}
+function calcDue(){
+  const v=document.getElementById('lmp').value;
+  if(!v){alert('Pick your last period date first');return;}
+  const lmp=new Date(v); const due=new Date(lmp); due.setDate(due.getDate()+280);
+  const now=new Date(); const weeks=Math.floor((now-lmp)/(1000*60*60*24*7));
+  document.getElementById('dueResult').textContent='Your due date na: '+due.toDateString()+' 🎉';
+  document.getElementById('weeks').textContent=weeks>0?weeks+' wks':'--';
+  speak('Your due date na '+due.toDateString()+'. Congratulations mama.');
+}
+</script>
+</body>
+  </html>
